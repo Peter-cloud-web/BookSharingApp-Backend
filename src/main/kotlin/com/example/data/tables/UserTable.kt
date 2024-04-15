@@ -1,3 +1,14 @@
 package com.example.data.tables
 
-data class UserTable()
+import org.jetbrains.exposed.sql.Table
+
+class UserTable:Table(){
+
+    val userId = integer("userId").autoIncrement()
+    val userEmail = varchar("userEmail",512)
+    val userName = varchar("userName", 512)
+    val userHashPassword = varchar("hashPassword",512)
+
+    override val primaryKey: PrimaryKey = PrimaryKey(userId)
+
+}
