@@ -2,7 +2,7 @@ package com.example.data.tables
 
 import org.jetbrains.exposed.sql.Table
 
-class UserTable:Table(){
+object UserTable:Table(){
 
     val userId = integer("userId").autoIncrement()
     val userEmail = varchar("userEmail",512)
