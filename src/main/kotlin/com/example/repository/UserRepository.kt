@@ -21,8 +21,8 @@ class UserRepository {
         }
     }
 
-    suspend fun findUserById(id:Int) = dbQuery {
-        UserTable.selectAll().where{
+    suspend fun findUserById(id: Int) = dbQuery {
+        UserTable.selectAll().where {
             UserTable.userId.eq(id)
         }
             .map { row ->
@@ -31,8 +31,8 @@ class UserRepository {
             .singleOrNull()
     }
 
-    private fun rowToUser(row:ResultRow?):User?{
-        if(row == null){
+    private fun rowToUser(row: ResultRow?): User? {
+        if (row == null) {
             return null
         }
         return User(
