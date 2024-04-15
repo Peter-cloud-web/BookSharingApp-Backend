@@ -1,4 +1,4 @@
-package com.example
+ package com.example
 
 import com.example.plugins.*
 import io.ktor.server.application.*
