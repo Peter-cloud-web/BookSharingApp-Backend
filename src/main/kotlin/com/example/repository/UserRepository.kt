@@ -21,9 +21,9 @@ class UserRepository {
         }
     }
 
-    suspend fun findUserById(id: Int) = dbQuery {
+    suspend fun findUserByEmail(email:String) = dbQuery {
         UserTable.selectAll().where {
-            UserTable.userId.eq(id)
+            UserTable.userEmail.eq(email)
         }
             .map { row ->
                 rowToUser(row)
