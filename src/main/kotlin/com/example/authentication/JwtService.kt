@@ -15,11 +15,11 @@ class JwtService {
         .withIssuer(issuer)
         .build()
 
-    fun generateToken(user: User):String{
+    fun generateToken(user: User): String {
         return JWT.create()
             .withSubject("BooksAuthentication")
             .withIssuer(issuer)
-            .withClaim("email",user.user_email)
+            .withClaim("email", user.user_email)
             .sign(algorithm)
     }
 }
