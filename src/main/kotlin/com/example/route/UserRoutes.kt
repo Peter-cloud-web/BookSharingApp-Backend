@@ -38,7 +38,7 @@ fun Route.UserRoutes(
 
         try {
             val user =
-                User(registerRequest.userEmail, hashFunction(registerRequest.userPassword), registerRequest.userName)
+                User(registerRequest.userEmail,  registerRequest.userName,hashFunction(registerRequest.userPassword))
             db.addUser(user)
             call.respond(HttpStatusCode.OK, Response(true, jwtService.generateToken(user)))
         } catch (e: Exception) {
@@ -71,5 +71,17 @@ fun Route.UserRoutes(
             call.respond(HttpStatusCode.Conflict, Response(false, e.message ?: "Some problem occurred"))
         }
     }
+
+    get("/v1/getUserDetails/{email}"){
+        try{
+            val userEmail = call.parameters["email"]?.toString()
+            val userDetail = db.getUserDetailsByEmail(userEmail!!)
+            call.respond(HttpStatusCode.OK,userDetail)
+        } catch (e:Exception){
+            call.respond(HttpStatusCode.Conflict, emptyList<UserRepository.UserDetails>())
+        }
+
+    }
+
 
 }

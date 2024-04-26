@@ -1,6 +1,8 @@
 package com.example.repository
 
+import com.example.data.tables.SentBidsTable
 import com.example.data.tables.UserTable
+import com.example.data.tables.WaitingListTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +17,8 @@ object DatabaseFactory {
         Database.connect(hikari())
 
         transaction {
-            SchemaUtils.create(UserTable)
+            SchemaUtils.create(UserTable,WaitingListTable, SentBidsTable)
+
         }
 
     }

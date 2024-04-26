@@ -19,7 +19,7 @@ class JwtService {
         return JWT.create()
             .withSubject("BooksAuthentication")
             .withIssuer(issuer)
-            .withClaim("email", user.user_email)
+            .withClaim("userEmail", user.user_email)
             .sign(algorithm)
     }
 }

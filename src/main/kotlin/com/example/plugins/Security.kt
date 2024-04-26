@@ -11,7 +11,7 @@ import io.ktor.server.response.*
 
 fun Application.configureSecurity() {
     // Please read the jwt property from the config file if you are using EngineMain
-    val jwtRealm = "Note server"
+    val jwtRealm = "Book server"
     val jwtService = JwtService()
     val db = UserRepository()
     authentication {
@@ -20,7 +20,7 @@ fun Application.configureSecurity() {
             verifier(jwtService.varifier)
             validate { credential ->
                 val payload = credential.payload
-                val email = payload.getClaim("email").asString()
+                val email = payload.getClaim("userEmail").asString()
                 val user = db.findUserByEmail(email)
                 user
             }
