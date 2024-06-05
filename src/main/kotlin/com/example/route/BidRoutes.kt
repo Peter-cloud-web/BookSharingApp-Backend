@@ -39,9 +39,8 @@ fun Route.BidRoute(bidRepo: BidRepo) {
                 val bids = bidRepo.getSentBids(email)
                 call.respond(HttpStatusCode.OK, bids)
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, emptyList<BidRepo.SentBidsResponse>())
+                call.respond(HttpStatusCode.Conflict, e.localizedMessage?:emptyList<BidRepo.SentBidsResponse>())
             }
-
         }
 
         get("/v1/receivedBids") {

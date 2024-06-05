@@ -2,21 +2,19 @@ package com.example.repository
 
 import com.example.data.model.Book
 import com.example.data.model.Category
-import com.example.data.model.categoryList
+import com.example.data.model.categoriesList
 import com.example.data.tables.BookTable
 import com.example.data.tables.CategoryTable
 import com.example.data.tables.UserTable
 import com.example.repository.DatabaseFactory.dbQuery
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class CategoryRepo {
 
     suspend fun insertCategories() {
-
         dbQuery {
-            CategoryTable.batchInsert(categoryList) { category ->
+            CategoryTable.batchInsert(categoriesList) { category ->
                 this[CategoryTable.categoryId] = category.id
                 this[CategoryTable.category] = category.category
             }
@@ -32,6 +30,8 @@ class CategoryRepo {
     @Serializable
     data class CategoryResponse(
         val bookOwner: String,
+        val firstName: String,
+        val lastName: String,
         val category: String,
         val postedAt: Long,
         val books: List<Book>
@@ -49,12 +49,15 @@ class CategoryRepo {
 
     private fun rowToCategoryResponse(row: ResultRow): CategoryResponse {
         val bookOwner = row[UserTable.userName]
+        val firstName = row[UserTable.firstName]
+        val lastName = row[UserTable.lastName]
         val category = row[CategoryTable.category]
         val postedAt = row[BookTable.createdAt]
         val book = Book(
             title = row[BookTable.title],
             author = row[BookTable.author],
             category = row[BookTable.category],
+            location = row[BookTable.location],
             page = row[BookTable.page],
             summary = row[BookTable.summary],
             isAvailable = row[BookTable.isAvailable],
@@ -62,7 +65,7 @@ class CategoryRepo {
 
         val books = listOf(book)
 
-        return CategoryResponse(bookOwner, category, postedAt, books)
+        return CategoryResponse(bookOwner, firstName, lastName, category, postedAt, books)
 
     }
 

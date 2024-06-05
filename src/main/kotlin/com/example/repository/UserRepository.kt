@@ -17,6 +17,8 @@ class UserRepository {
         dbQuery {
             UserTable.insert { userTable ->
                 userTable[UserTable.userEmail] = user.user_email
+                userTable[UserTable.firstName] = user.user_firstname
+                userTable[UserTable.lastName] = user.user_lastname
                 userTable[UserTable.userName] = user.user_name
                 userTable[UserTable.userHashPassword] = user.user_hash_password
             }
@@ -26,13 +28,16 @@ class UserRepository {
 
     @Serializable
     data class UserDetails(
-        val userName:String,
-        val postedAt:Long,
-        val associatedBooks:List<Book>
+        val userName: String,
+        val userEmail: String,
+        val userFirstName: String,
+        val userLastName: String,
+        val postedAt: Long,
+        val associatedBooks: List<Book>
 
     )
 
-    suspend fun getUserDetailsByEmail(email: String) = dbQuery{
+    suspend fun getUserDetailsByEmail(email: String) = dbQuery {
         (UserTable.innerJoin(BookTable))
             .selectAll()
             .where {
@@ -42,7 +47,7 @@ class UserRepository {
             }
     }
 
-    suspend fun findUserByEmail(email:String) = dbQuery {
+    suspend fun findUserByEmail(email: String) = dbQuery {
         UserTable.selectAll().where {
             UserTable.userEmail.eq(email)
         }
@@ -59,22 +64,28 @@ class UserRepository {
         return User(
             user_email = row[UserTable.userEmail],
             user_hash_password = row[UserTable.userHashPassword],
-            user_name = row[UserTable.userName]
+            user_name = row[UserTable.userName],
+            user_firstname = row[UserTable.firstName],
+            user_lastname = row[UserTable.lastName]
         )
     }
 
-    private fun rowToUserDetails(row: ResultRow):UserDetails{
+    private fun rowToUserDetails(row: ResultRow): UserDetails {
         val userName = row[UserTable.userName]
+        val userEmail = row[UserTable.userEmail]
+        val userFirstName = row[UserTable.firstName]
+        val userLastName = row[UserTable.lastName]
         val postedAt = row[BookTable.createdAt]
         val book = Book(
             title = row[BookTable.title],
             author = row[BookTable.author],
             category = row[BookTable.category],
+            location = row[BookTable.location],
             page = row[BookTable.page],
             summary = row[BookTable.summary],
             isAvailable = row[BookTable.isAvailable],
         )
         val books = listOf(book)
-      return UserDetails(userName,postedAt,books)
+        return UserDetails(userName, userEmail, userFirstName, userLastName, postedAt, books)
     }
 }

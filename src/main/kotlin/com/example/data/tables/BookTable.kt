@@ -14,6 +14,8 @@ object BookTable : Table() {
     val id = integer("bookId").autoIncrement()
     val userEmail = varchar("userEmail",512).references(UserTable.userEmail)
     val categoryId = integer("categoryId").references(CategoryTable.categoryId)
+    val locationId = integer("locationId").references(LocationTable.locationId)
+    val location = varchar("location",512)
     val category = varchar("category",512)
     val title = varchar("bookTitle", 512)
     val author = varchar("bookAuthor", 512)

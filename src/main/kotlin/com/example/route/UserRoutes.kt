@@ -8,6 +8,7 @@ import com.example.data.model.User
 import com.example.repository.UserRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -23,8 +24,10 @@ fun Route.UserRoutes(
         val email = call.request.queryParameters["email"]!!
         val password = call.request.queryParameters["password"]!!
         val username = call.request.queryParameters["username"]!!
+        val userfirstname = call.request.queryParameters["userfirstname"]!!
+        val userlastname = call.request.queryParameters["userlastname"]!!
 
-        val user = User(email, hashFunction(password), username)
+        val user = User(email, hashFunction(password), username, userfirstname, userlastname)
         call.respond(jwtService.generateToken(user))
     }
 
@@ -38,7 +41,7 @@ fun Route.UserRoutes(
 
         try {
             val user =
-                User(registerRequest.userEmail,  registerRequest.userName,hashFunction(registerRequest.userPassword))
+                User(registerRequest.userEmail, registerRequest.userName, registerRequest.firstName,registerRequest.lastName,hashFunction(registerRequest.userPassword))
             db.addUser(user)
             call.respond(HttpStatusCode.OK, Response(true, jwtService.generateToken(user)))
         } catch (e: Exception) {
@@ -72,16 +75,27 @@ fun Route.UserRoutes(
         }
     }
 
-    get("/v1/getUserDetails/{email}"){
-        try{
+    get("/v1/getUserDetails/{email}") {
+        try {
             val userEmail = call.parameters["email"]?.toString()
             val userDetail = db.getUserDetailsByEmail(userEmail!!)
-            call.respond(HttpStatusCode.OK,userDetail)
-        } catch (e:Exception){
+            call.respond(HttpStatusCode.OK, userDetail)
+        } catch (e: Exception) {
             call.respond(HttpStatusCode.Conflict, emptyList<UserRepository.UserDetails>())
         }
 
     }
 
+    authenticate("jwt") {
+        get("/v1/getLoggedInUser") {
+            try {
+                val email = call.principal<User>()!!.user_email
+                val userDetail = db.getUserDetailsByEmail(email)
+                call.respond(HttpStatusCode.OK, userDetail)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.Conflict, emptyList<UserRepository.UserDetails>())
+            }
+        }
+    }
 
 }

@@ -2,15 +2,11 @@ package com.example.repository
 
 import com.example.data.model.Book
 import com.example.data.model.SentBid
-import com.example.data.model.User
 import com.example.data.tables.BookTable
 import com.example.data.tables.SentBidsTable
-import com.example.data.tables.UserTable
 import com.example.repository.DatabaseFactory.dbQuery
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 
 class BidRepo {
@@ -19,7 +15,9 @@ class BidRepo {
     @Serializable
     data class SentBidsResponse(
         val biddedBookOwner: String,
-        val biddedBookId:Int,
+//        val biddedFirstName: String,
+//        val biddedLastName: String,
+        val biddedBookId: Int,
         val biddedBook: List<Book>,
         val book: List<SentBid>
     )
@@ -27,7 +25,9 @@ class BidRepo {
     @Serializable
     data class ReceivedBidsResponse(
         val bidder: String,
-        val biddedBookId:Int,
+//        val bidderFirstName: String,
+//        val bidderLastName: String,
+        val biddedBookId: Int,
         val biddedBook: List<Book>,
         val book: List<SentBid>
     )
@@ -41,7 +41,9 @@ class BidRepo {
 
             SentBidsTable.insert { bidRow ->
                 bidRow[SentBidsTable.bidderEmail] = userEmail
-                if(ownerEmail != null){   bidRow[SentBidsTable.bookOwnerEmail] = ownerEmail}
+                if (ownerEmail != null) {
+                    bidRow[SentBidsTable.bookOwnerEmail] = ownerEmail
+                }
                 bidRow[SentBidsTable.bookId] = bookId
                 bidRow[SentBidsTable.author] = bid.author
                 bidRow[SentBidsTable.page] = bid.pages
@@ -58,18 +60,16 @@ class BidRepo {
             .selectAll()
             .where {
                 SentBidsTable.bidderEmail.eq(email)
-
             }
             .map { row ->
                 rowToSentBidResponse(row)
             }
     }
 
-
-    suspend fun getReceivedBids(email: String):List<ReceivedBidsResponse> = dbQuery {
+    suspend fun getReceivedBids(email: String): List<ReceivedBidsResponse> = dbQuery {
         (SentBidsTable.innerJoin(BookTable))
             .selectAll()
-            .where{
+            .where {
                 SentBidsTable.bookOwnerEmail.eq(email)
             }.map { row ->
                 rowToReceivedBidResponse(row)
@@ -80,11 +80,14 @@ class BidRepo {
 private fun rowToSentBidResponse(row: ResultRow): BidRepo.SentBidsResponse {
 
     var bidder = row[SentBidsTable.bookOwnerEmail]
+//    val biddedFirstName = row[UserTable.firstName]
+//    val biddedLastName = row[UserTable.lastName]
     var biddedBookId = row[BookTable.id]
     val book = Book(
         title = row[BookTable.title],
         author = row[BookTable.author],
         category = row[BookTable.category],
+        location = row[BookTable.location],
         page = row[BookTable.page],
         summary = row[BookTable.summary],
         isAvailable = row[BookTable.isAvailable]
@@ -101,18 +104,21 @@ private fun rowToSentBidResponse(row: ResultRow): BidRepo.SentBidsResponse {
     val books = listOf(book)
     val bids = listOf(sentBidBook)
 
-    return BidRepo.SentBidsResponse(bidder,biddedBookId, books, bids)
+    return BidRepo.SentBidsResponse(bidder, biddedBookId, books, bids)
 
 }
 
 private fun rowToReceivedBidResponse(row: ResultRow): BidRepo.ReceivedBidsResponse {
 
-    var bidedBookOwner = row[SentBidsTable.bidderEmail]
-    var biddedBookId = row[BookTable.id]
+    var biderBookOwner = row[SentBidsTable.bidderEmail]
+//    val bidderFirstName = row[UserTable.firstName]
+//    val bidderLastName = row[UserTable.lastName]
+    var bidderBookId = row[BookTable.id]
     val book = Book(
         title = row[BookTable.title],
         author = row[BookTable.author],
         category = row[BookTable.category],
+        location = row[BookTable.location],
         page = row[BookTable.page],
         summary = row[BookTable.summary],
         isAvailable = row[BookTable.isAvailable]
@@ -129,7 +135,7 @@ private fun rowToReceivedBidResponse(row: ResultRow): BidRepo.ReceivedBidsRespon
     val books = listOf(book)
     val bids = listOf(sentBidBook)
 
-    return BidRepo.ReceivedBidsResponse(bidedBookOwner,biddedBookId, books, bids)
+    return BidRepo.ReceivedBidsResponse(biderBookOwner, bidderBookId, books, bids)
 
 }
 

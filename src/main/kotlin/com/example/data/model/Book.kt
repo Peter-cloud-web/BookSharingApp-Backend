@@ -7,6 +7,7 @@ data class Book(
     val title:String,
     val author:String,
     val category:String,
+    val location:String,
     val page:Int,
     val summary:String,
     val isAvailable:Boolean,
