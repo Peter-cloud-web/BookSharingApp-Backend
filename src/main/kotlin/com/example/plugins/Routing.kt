@@ -6,8 +6,11 @@ import com.example.data.model.User
 import com.example.repository.*
 import com.example.route.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.openapi.*
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.swagger.codegen.v3.generators.html.StaticHtmlCodegen
 
 fun Application.configureRouting() {
     val  db = UserRepository()
@@ -18,6 +21,9 @@ fun Application.configureRouting() {
     val jwtService = JwtService()
     val hashFunction = {s:String -> hashing(s) }
     routing {
+        swaggerUI(path = "swagger", swaggerFile = "openapi/documentation.yaml") {
+            version = "4.15.5"
+        }
         get("/") {
             call.respondText("Hello World!")
         }

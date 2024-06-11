@@ -1,0 +1,379 @@
+openapi: 3.0.0
+
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        userEmail:
+          type: string
+        categoryId:
+          type: integer
+        locationId:
+          type: integer
+        location:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        page:
+          type: integer
+        summary:
+          type: string
+        isAvailable:
+          type: boolean
+        createdAt:
+          type: integer
+
+    BookResponse:
+      type: object
+      properties:
+        owner:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        bookId:
+          type: integer
+        categoryId:
+          type: integer
+        timeOfCreation:
+          type: integer
+        book:
+          $ref: '#/components/schemas/Book'
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        categoryId:
+          type: string
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        locationId:
+          type: string
+
+    RegisterRequest:
+      type: object
+      properties:
+        userEmail:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        userPassword:
+          type: string
+
+    LoginRequest:
+      type: object
+      properties:
+        userEmail:
+          type: string
+        userPassword:
+          type: string
+
+    Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        token:
+          type: string
+
+    UserDetails:
+      type: object
+      properties:
+        user_email:
+          type: string
+        user_firstname:
+          type: string
+        user_lastname:
+          type: string
+        user_name:
+          type: string
+
+    securitySchemes:
+      jwt:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+
+info:
+  title: BookBites API
+  version: 1.0.0
+  description: This is BookBites API description
+servers:
+  - url: http://localhost:8080/
+paths:
+  /v1/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '400':
+          description: Bad Request (Missing Some Fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '409':
+          description: Conflict (Some problems occurred)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+  /v1/login:
+    post:
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '400':
+          description: Bad Request (Missing Fields, Wrong email, Password incorrect)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '409':
+          description: Conflict (Some problem occurred)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+  /token:
+    get:
+      summary: Generate a JWT token
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: userfirstname
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: userlastname
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /v1/getLoggedInUser:
+    get:
+      summary: Get details of the logged-in user
+      security:
+        - jwt: [ ]
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDetails'
+
+  /v1/getUserDetails/{email}:
+    get:
+      summary: Get user details by email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDetails'
+  /v1/create:
+    post:
+      summary: Create a book post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref:'#/components/schemas/Book'
+      responses:
+        '200':
+          description: Book posted successfully
+        '403':
+          description: Missing fields
+        '404':
+          description: Some problems occurred
+
+  /v1/allBooks:
+    get:
+      summary: Get all books
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookResponse'
+
+  /v1/getBooksById/{id}:
+    get:
+      summary: Get a book by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '404':
+          description: Book not found
+
+  /v1/getAllCategories:
+    get:
+      summary: Get all categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref:'#/components/schemas/Category'
+    responses:
+      '200':
+        description: Categories list
+      '403':
+        description: Conflict
+      '404':
+        description: Some problems occurred
+
+  /v1/getBooksByCategory/{category}:
+    get:
+      summary: Get all books in a category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref:'#/components/schemas/Category'
+    responses:
+      '200':
+        description: Categories list
+      '403':
+        description: Conflict
+      '404':
+        description: Some problems occurred
+
+  /v1/getAllLocations:
+    get:
+      summary: Get all locations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref:'#/components/schemas/Location'
+      responses:
+        '200':
+          description: Location list
+        '403':
+          description: Conflict
+        '404':
+          description: Some problems occurred
+
+  v1/getBooksByLocation{location}:
+    get:
+      summary: Get books in a particular location
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref:'#/components/schemas/Location'
+      responses:
+        '200':
+          description: Location list
+        '403':
+          description: Conflict
+        '404':
+          description: Some problems occurred
+
+
