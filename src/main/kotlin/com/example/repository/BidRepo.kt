@@ -105,7 +105,6 @@ private fun rowToSentBidResponse(row: ResultRow): BidRepo.SentBidsResponse {
     val bids = listOf(sentBidBook)
 
     return BidRepo.SentBidsResponse(bidder, biddedBookId, books, bids)
-
 }
 
 private fun rowToReceivedBidResponse(row: ResultRow): BidRepo.ReceivedBidsResponse {
@@ -123,7 +122,6 @@ private fun rowToReceivedBidResponse(row: ResultRow): BidRepo.ReceivedBidsRespon
         summary = row[BookTable.summary],
         isAvailable = row[BookTable.isAvailable]
     )
-
 
     val sentBidBook = SentBid(
         title = row[SentBidsTable.title],

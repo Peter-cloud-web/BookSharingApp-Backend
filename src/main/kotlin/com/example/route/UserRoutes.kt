@@ -39,9 +39,15 @@ fun Route.UserRoutes(
             return@post
         }
 
-        try {
+        try { 
             val user =
-                User(registerRequest.userEmail, registerRequest.userName, registerRequest.firstName,registerRequest.lastName,hashFunction(registerRequest.userPassword))
+                User(
+                    user_email = registerRequest.userEmail,
+                    user_firstname = registerRequest.firstName,
+                    user_lastname = registerRequest.lastName,
+                    user_name = registerRequest.userName,
+                    user_hash_password = hashFunction(registerRequest.userPassword)
+                )
             db.addUser(user)
             call.respond(HttpStatusCode.OK, Response(true, jwtService.generateToken(user)))
         } catch (e: Exception) {

@@ -28,10 +28,10 @@ class UserRepository {
 
     @Serializable
     data class UserDetails(
-        val userName: String,
         val userEmail: String,
         val userFirstName: String,
         val userLastName: String,
+        val userName: String,
         val postedAt: Long,
         val associatedBooks: List<Book>
 
