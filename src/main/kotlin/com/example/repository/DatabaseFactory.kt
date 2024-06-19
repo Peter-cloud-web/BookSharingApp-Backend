@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.data.tables.AcceptedBidsTable
 import com.example.data.tables.SentBidsTable
 import com.example.data.tables.UserTable
 import com.example.data.tables.WaitingListTable
@@ -17,7 +18,7 @@ object DatabaseFactory {
         Database.connect(hikari())
 
         transaction {
-            SchemaUtils.create(UserTable,WaitingListTable, SentBidsTable)
+            SchemaUtils.create(UserTable,WaitingListTable, SentBidsTable,AcceptedBidsTable)
 
         }
 

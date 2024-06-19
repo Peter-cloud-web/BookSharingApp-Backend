@@ -14,6 +14,7 @@ object SentBidsTable : Table() {
     val page = integer("bookPages")
     val summary = varchar("bookSummary", 1000)
     val sentAt = long("createdAt")
+    val isBidAccepted = bool("isBidAccepted")
 
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }
