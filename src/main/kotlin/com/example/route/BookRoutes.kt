@@ -3,6 +3,7 @@ package com.example.route
 import com.example.data.model.Book
 import com.example.data.model.Response
 import com.example.data.model.User
+import com.example.data.tables.BookTable
 import com.example.repository.BookRepo
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -11,6 +12,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.utils.io.*
+import java.util.*
+import kotlin.NoSuchElementException
 
 fun Route.BookRoutes(
     repo: BookRepo
@@ -34,6 +37,7 @@ fun Route.BookRoutes(
         }  
 
         get("/v1/allBooks") {
+
             try {
                 val books = repo.getAllBooks()
                 call.respond(HttpStatusCode.OK, books)
@@ -58,5 +62,33 @@ fun Route.BookRoutes(
                 call.respond(HttpStatusCode.InternalServerError, "Internal server error")
             }
         }
+    }
+
+        get("/v1/book/{id}/image"){
+            val bookId = call.parameters["id"]?.toInt()
+            if (bookId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid book ID")
+                return@get
+            }
+            val book = repo.getBookById(bookId)
+            if (book == null) {
+                call.respond(HttpStatusCode.NotFound, "Book not found")
+                return@get
+            }
+            call.respondBytes(book.book.bookImage, ContentType.Image.PNG)
+        }
+
+    get("/v1/profile/{email}/image"){
+        val userEmail = call.parameters["email"]?.toString()
+        if (userEmail == null) {
+            call.respond(HttpStatusCode.BadRequest, "Invalid user email")
+            return@get
+        }
+        val picture = repo.getUserAvatar(userEmail)
+        if (picture == null) {
+            call.respond(HttpStatusCode.NotFound, "Picture not found")
+            return@get
+        }
+        call.respondBytes(picture.profilePic, ContentType.Image.PNG)
     }
 }

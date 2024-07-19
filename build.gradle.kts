@@ -43,6 +43,7 @@ dependencies {
     implementation ("org.jetbrains.exposed:exposed-jdbc:0.49.0")
     implementation ("org.postgresql:postgresql:42.3.8")
     implementation ("com.zaxxer:HikariCP:4.0.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.14.2")
 
     implementation("io.ktor:ktor-server-openapi:$ktor_version")
     implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")

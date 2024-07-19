@@ -20,16 +20,17 @@ fun Route.UserRoutes(
     jwtService: JwtService,
     hashFunction: (String) -> String
 ) {
-    get("/token") {
-        val email = call.request.queryParameters["email"]!!
-        val password = call.request.queryParameters["password"]!!
-        val username = call.request.queryParameters["username"]!!
-        val userfirstname = call.request.queryParameters["userfirstname"]!!
-        val userlastname = call.request.queryParameters["userlastname"]!!
-
-        val user = User(email, hashFunction(password), username, userfirstname, userlastname)
-        call.respond(jwtService.generateToken(user))
-    }
+//    get("/token") {
+//        val email = call.request.queryParameters["email"]!!
+//        val password = call.request.queryParameters["password"]!!
+//        val username = call.request.queryParameters["username"]!!
+//        val userfirstname = call.request.queryParameters["userfirstname"]!!
+//        val profilePic = call.request.queryParameters[""]
+//        val userlastname = call.request.queryParameters["userlastname"]!!
+//
+//        val user = User(email, hashFunction(password), username, userfirstname, profilePic,userlastname)
+//        call.respond(jwtService.generateToken(user))
+//    }
 
     post("/v1/register") {
         val registerRequest = try {
@@ -46,6 +47,7 @@ fun Route.UserRoutes(
                     user_firstname = registerRequest.firstName,
                     user_lastname = registerRequest.lastName,
                     user_name = registerRequest.userName,
+                    profilePicture = registerRequest.profilePicture,
                     user_hash_password = hashFunction(registerRequest.userPassword)
                 )
             db.addUser(user)
@@ -85,7 +87,11 @@ fun Route.UserRoutes(
         try {
             val userEmail = call.parameters["email"]?.toString()
             val userDetail = db.getUserDetailsByEmail(userEmail!!)
-            call.respond(HttpStatusCode.OK, userDetail)
+            if (userDetail != null) {
+                call.respond(HttpStatusCode.OK, userDetail)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "User not found")
+            }
         } catch (e: Exception) {
             call.respond(HttpStatusCode.Conflict, emptyList<UserRepository.UserDetails>())
         }
@@ -97,7 +103,11 @@ fun Route.UserRoutes(
             try {
                 val email = call.principal<User>()!!.user_email
                 val userDetail = db.getUserDetailsByEmail(email)
-                call.respond(HttpStatusCode.OK, userDetail)
+                if (userDetail != null) {
+                    call.respond(HttpStatusCode.OK, userDetail)
+                } else {
+                    call.respond(HttpStatusCode.NotFound, "User not found")
+                }
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, emptyList<UserRepository.UserDetails>())
             }

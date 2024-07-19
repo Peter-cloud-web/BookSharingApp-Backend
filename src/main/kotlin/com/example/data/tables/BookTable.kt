@@ -15,6 +15,7 @@ object BookTable : Table() {
     val userEmail = varchar("userEmail",512).references(UserTable.userEmail)
     val categoryId = integer("categoryId").references(CategoryTable.categoryId)
     val locationId = integer("locationId").references(LocationTable.locationId)
+    val bookImage = binary("bookImage")
     val location = varchar("location",512)
     val category = varchar("category",512)
     val title = varchar("bookTitle", 512)

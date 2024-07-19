@@ -1,9 +1,6 @@
 package com.example.repository
 
-import com.example.data.model.Book
-import com.example.data.model.Category
-import com.example.data.model.Location
-import com.example.data.model.User
+import com.example.data.model.*
 import com.example.data.tables.BookTable
 import com.example.data.tables.CategoryTable
 import com.example.data.tables.LocationTable
@@ -12,6 +9,7 @@ import com.example.repository.DatabaseFactory.dbQuery
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import java.util.Base64
 
 class BookRepo {
     val currentCreationTime = System.currentTimeMillis()
@@ -23,6 +21,7 @@ class BookRepo {
             BookTable.insert { bookTable ->
                 bookTable[BookTable.userEmail] = email
                 bookTable[BookTable.page] = book.page
+                bookTable[BookTable.bookImage] = book.bookImage
                 bookTable[BookTable.category] = book.category
                 bookTable[BookTable.categoryId] = categoryId
                 bookTable[BookTable.locationId] = locationId
@@ -37,6 +36,18 @@ class BookRepo {
     }
 
     @Serializable
+    data class BookResponse2(
+        val owner: String,
+        val firstName:String,
+        val lastName:String,
+        val email: String,
+        val bookId: Int,
+        val categoryId: Int,
+        val timeOfCreation: Long,
+        val book: Book2,
+    )
+
+    @Serializable
     data class BookResponse(
         val owner: String,
         val firstName:String,
@@ -48,7 +59,19 @@ class BookRepo {
         val book: Book,
     )
 
-    suspend fun getAllBooks(): List<BookResponse> = dbQuery {
+    @Serializable
+    data class ImageResponse(
+        val bookImage: ByteArray,
+    )
+
+    @Serializable
+    data class ProfilePicResponse(
+        val profilePic: ByteArray,
+    )
+
+
+
+    suspend fun getAllBooks(): List<BookResponse2> = dbQuery {
 
         (BookTable.innerJoin(UserTable)
             .slice(BookTable.columns + UserTable.columns))
@@ -65,7 +88,14 @@ class BookRepo {
     suspend fun getBookById(id: Int): BookResponse? = dbQuery {
         (BookTable.innerJoin(UserTable)).selectAll()
             .where(BookTable.id.eq(id))
-            .map { row -> rowToBookResponse(row) }
+            .map { row -> rowToBookResponse2(row) }
+            .singleOrNull()
+    }
+    
+    suspend fun getUserAvatar(userEmail:String):ProfilePicResponse? = dbQuery {
+        (BookTable.innerJoin(UserTable)).selectAll()
+            .where(BookTable.userEmail.eq(userEmail))
+            .map { row -> rowToUserImage(row) }
             .singleOrNull()
     }
 
@@ -80,6 +110,16 @@ class BookRepo {
         LocationTable.selectAll().where { LocationTable.location.eq(location) }
             .map { rowToLocation(it) }
             .singleOrNull()
+    }
+
+    private fun rowToBookImageResponse(row: ResultRow): ImageResponse{
+        val bookImage = row[BookTable.bookImage]
+        return ImageResponse(bookImage = bookImage)
+    }
+
+    private fun rowToUserImage(row:ResultRow):ProfilePicResponse{
+        val userProfilePhoto = row[UserTable.profilePicture]
+        return ProfilePicResponse(profilePic = userProfilePhoto)
     }
 
 
@@ -97,7 +137,39 @@ class BookRepo {
         )
     }
 
-    private fun rowToBookResponse(row: ResultRow): BookResponse {
+
+
+
+
+    private fun rowToBookResponse(row: ResultRow): BookResponse2 {
+        val userName = row[UserTable.userName]
+        val firstName = row[UserTable.firstName]
+        val lastName = row[UserTable.lastName]
+        val userEmail = row[UserTable.userEmail]
+        val book = Book2(
+            title = row[BookTable.title],
+            author = row[BookTable.author],
+            category = row[BookTable.category],
+            location = row[BookTable.location],
+            page = row[BookTable.page],
+            summary = row[BookTable.summary],
+            isAvailable = row[BookTable.isAvailable],
+        )
+
+        return BookResponse2(
+            bookId = row[BookTable.id],
+            categoryId = row[BookTable.categoryId],
+            timeOfCreation = row[BookTable.createdAt],
+            owner = userName,
+            firstName = firstName,
+            lastName = lastName,
+            email = userEmail,
+            book = book,
+        )
+    }
+
+
+    private fun rowToBookResponse2(row: ResultRow): BookResponse {
         val userName = row[UserTable.userName]
         val firstName = row[UserTable.firstName]
         val lastName = row[UserTable.lastName]
@@ -109,6 +181,7 @@ class BookRepo {
             location = row[BookTable.location],
             page = row[BookTable.page],
             summary = row[BookTable.summary],
+            bookImage = row[BookTable.bookImage],
             isAvailable = row[BookTable.isAvailable],
         )
 

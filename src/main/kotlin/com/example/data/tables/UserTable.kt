@@ -10,6 +10,7 @@ object UserTable : Table() {
     val firstName = varchar("firstName",512)
     val lastName = varchar("lastName",512)
     val userName = varchar("userName", 512).uniqueIndex()
+    val profilePicture = binary("profilePicture")
     val userHashPassword = varchar("hashPassword", 512)
 
     override val primaryKey: PrimaryKey = PrimaryKey(userEmail)

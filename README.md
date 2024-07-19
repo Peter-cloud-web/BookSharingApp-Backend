@@ -1,4 +1,4 @@
-﻿**[BOOKBITE API](https://github.com/Peter-cloud-web/BookBites)**
+﻿**[BOOKBITES API](https://github.com/Peter-cloud-web/BookBites) DOCUMENTATION**
 
 **This is the serverside web service API for the BookBite Application. An application that will enable users to share hardcopy books with their peers in exchange for another. Users will post a book with the title, category, and a short preview of the book and a cover photo and interested parties will bid for the book and user chooses who to offer.**
 
@@ -7,8 +7,8 @@
 This API uses token based authentication with JWT. Username and password must be provided and bearer header to access data on every request made to the server.
 
 **Authorization and Authentication Endpoints** 
-Registration  - [/v1/register](http://localhost:8080/v1/register)
-Login - [/v1/login](http://localhost:8080/v1/login)
+ - Registration  - [/v1/register](http://localhost:8080/v1/register)
+ - Login - [/v1/login](http://localhost:8080/v1/login)
 
 ## **Endpoints**
 

@@ -19,6 +19,7 @@ import org.jetbrains.exposed.sql.selectAll
 
 class LocationRepo {
 
+
     suspend fun insertLocations() {
         dbQuery {
             LocationTable.batchInsert(locationsList) { location ->
@@ -56,17 +57,22 @@ class LocationRepo {
     }
 
     @Serializable
-    data class LocationResponse(
-        val bookOwner: String,
-        val category: String,
-        val postedAt: Long,
-        val books: List<Book>
+    data class BookResponse(
+        val owner: String,
+        val firstName: String,
+        val lastName: String,
+        val email: String,
+        val bookId: Int,
+        val categoryId: Int,
+        val timeOfCreation: Long,
+        val book: Book,
     )
 
-    private fun rowToLocationResponse(row: ResultRow): LocationResponse {
-        val bookOwner = row[UserTable.userName]
-        val category = row[CategoryTable.category]
-        val postedAt = row[BookTable.createdAt]
+    private fun rowToLocationResponse(row: ResultRow): BookResponse {
+        val userName = row[UserTable.userName]
+        val firstName = row[UserTable.firstName]
+        val lastName = row[UserTable.lastName]
+        val userEmail = row[UserTable.userEmail]
         val book = Book(
             title = row[BookTable.title],
             author = row[BookTable.author],
@@ -74,12 +80,19 @@ class LocationRepo {
             location = row[BookTable.location],
             page = row[BookTable.page],
             summary = row[BookTable.summary],
+            bookImage = row[BookTable.bookImage],
             isAvailable = row[BookTable.isAvailable],
         )
 
-        val books = listOf(book)
-
-        return LocationResponse(bookOwner, category, postedAt, books)
-
+        return BookResponse(
+            bookId = row[BookTable.id],
+            categoryId = row[BookTable.categoryId],
+            timeOfCreation = row[BookTable.createdAt],
+            owner = userName,
+            firstName = firstName,
+            lastName = lastName,
+            email = userEmail,
+            book = book,
+        )
     }
 }

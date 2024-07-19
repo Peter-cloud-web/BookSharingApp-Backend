@@ -47,12 +47,23 @@ class CategoryRepo {
             }
     }
 
-    private fun rowToCategoryResponse(row: ResultRow): CategoryResponse {
-        val bookOwner = row[UserTable.userName]
+    @Serializable
+    data class BookResponse(
+        val owner: String,
+        val firstName: String,
+        val lastName: String,
+        val email: String,
+        val bookId: Int,
+        val categoryId: Int,
+        val timeOfCreation: Long,
+        val book: Book,
+    )
+
+    private fun rowToCategoryResponse(row: ResultRow): BookResponse {
+        val userName = row[UserTable.userName]
         val firstName = row[UserTable.firstName]
         val lastName = row[UserTable.lastName]
-        val category = row[CategoryTable.category]
-        val postedAt = row[BookTable.createdAt]
+        val userEmail = row[UserTable.userEmail]
         val book = Book(
             title = row[BookTable.title],
             author = row[BookTable.author],
@@ -60,13 +71,20 @@ class CategoryRepo {
             location = row[BookTable.location],
             page = row[BookTable.page],
             summary = row[BookTable.summary],
+            bookImage = row[BookTable.bookImage],
             isAvailable = row[BookTable.isAvailable],
         )
 
-        val books = listOf(book)
-
-        return CategoryResponse(bookOwner, firstName, lastName, category, postedAt, books)
-
+        return BookResponse(
+            bookId = row[BookTable.id],
+            categoryId = row[BookTable.categoryId],
+            timeOfCreation = row[BookTable.createdAt],
+            owner = userName,
+            firstName = firstName,
+            lastName = lastName,
+            email = userEmail,
+            book = book,
+        )
     }
 
     private fun rowToCategory(row: ResultRow): Category? {

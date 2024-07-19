@@ -8,6 +8,7 @@ data class RegisterRequest(
     val firstName:String,
     val lastName:String,
     val userName:String,
+    val profilePicture:ByteArray,
     val userPassword:String
 
 )

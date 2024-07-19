@@ -168,6 +168,7 @@ private fun rowToSentBidResponse(row: ResultRow): BidRepo.SentBidsResponse {
         location = row[BookTable.location],
         page = row[BookTable.page],
         summary = row[BookTable.summary],
+        bookImage = row[BookTable.bookImage],
         isAvailable = row[BookTable.isAvailable]
     )
 
@@ -200,6 +201,7 @@ private fun rowToReceivedBidResponse(row: ResultRow): BidRepo.ReceivedBidsRespon
         location = row[BookTable.location],
         page = row[BookTable.page],
         summary = row[BookTable.summary],
+        bookImage = row[BookTable.bookImage],
         isAvailable = row[BookTable.isAvailable]
     )
 
